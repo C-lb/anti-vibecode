@@ -1,0 +1,267 @@
+/* ============================================================================
+   ANTI-VIBECODE — house UI standard sheet.
+   Copy in and build from these tokens + tiers. Every value is derived here;
+   don't hand-tune per element. See SKILL.md for the rules these encode.
+   ============================================================================ */
+
+/* ── Fonts ──────────────────────────────────────────────────────────────────
+   Sans only. DM Sans + Plus Jakarta Sans ship on Google Fonts; Geist via its
+   own CDN; Axiforma is commercial (license it, else fall back to the others). */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+/* @import url('https://cdn.jsdelivr.net/npm/geist@1/dist/font.css');  // optional: Geist */
+
+:root{
+  /* ── ACCENT — exactly ONE. Change the hue per project; nothing else gets colour. ── */
+  --accent:        #6c8cff;
+  --accent-2:      #8aa2ff;                 /* accent hover only */
+  --accent-ink:    #0b0d16;                 /* text/icon sitting ON the accent fill */
+
+  /* ── NEUTRAL RAMP (dark default) — the whole UI is built from these + accent ── */
+  --bg:            #0c0c0e;                 /* flat near-black canvas — NO spotlight gradient */
+  --surface-1:     #161618;                 /* raised: cards, button rest, search pill */
+  --surface-2:     #202023;                 /* hover / elevated */
+  --surface-3:     #2a2a2e;                 /* pressed / active tray */
+  --line:          rgba(255,255,255,.06);   /* hairline — use sparingly, prefer raise over border */
+  --ink:           #f4f4f5;                 /* primary text */
+  --ink-2:         #a1a1aa;                 /* secondary text */
+  --ink-3:         #6b6b73;                 /* muted / placeholder */
+
+  /* ── SEMANTIC COLOUR — meaning only, never decoration. base = text/icon; -soft = tint; -line = ring.
+        warning is an amber because pure yellow is illegible on dark. ── */
+  --info:#4a9bff;    --info-soft:rgba(74,155,255,.14);    --info-line:rgba(74,155,255,.34);
+  --success:#3ecf8e; --success-soft:rgba(62,207,142,.14); --success-line:rgba(62,207,142,.34);
+  --warn:#e3b341;    --warn-soft:rgba(227,179,65,.14);    --warn-line:rgba(227,179,65,.34);
+  --danger:#f4607a;  --danger-soft:rgba(244,96,122,.14);  --danger-line:rgba(244,96,122,.34);
+  --ok:var(--success);                       /* alias kept for older refs */
+
+  /* ── SOFT SHADOW — diffuse, low-opacity, big blur, negative spread, tinted to bg ── */
+  --shadow:        0 14px 34px -18px rgba(0,0,0,.55);
+  --shadow-lg:     0 30px 60px -28px rgba(0,0,0,.65);
+  --shadow-pop:    0 24px 50px -18px rgba(0,0,0,.72);   /* deeper: menus/popovers/buttons raised ABOVE a card */
+  /* the "raise": lit top edge + base shade = Apple-style glass lift, no hard border */
+  --raise:         inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.45);
+
+  /* ── SPACING — 4px scale, generous. Never tighter than --s2 between text blocks. ── */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+  --gap:24px;                               /* grid gutter */
+  --card-pad:24px;                          /* single padding inside a card */
+
+  /* ── RADII ── */
+  --r-sm:10px;                              /* small buttons / chips (spec: 10px) */
+  --r-md:14px;                              /* buttons / inputs */
+  --r-lg:20px;                              /* cards */
+  --r-pill:999px;
+
+  /* ── TYPE — mobile-first base 17px; desktop tightens to 13px. Scale = multipliers. ── */
+  --fs-base:17px;
+  --font:'Plus Jakarta Sans','DM Sans','Geist',-apple-system,system-ui,sans-serif;
+  --t-cap:  calc(var(--fs-base) * .80);
+  --t-body: var(--fs-base);
+  --t-lead: calc(var(--fs-base) * 1.18);
+  --t-h3:   calc(var(--fs-base) * 1.45);
+  --t-h2:   calc(var(--fs-base) * 1.95);
+  --t-h1:   calc(var(--fs-base) * 2.60);
+
+  /* ── BUTTON — horizontal padding is ALWAYS 2× vertical ── */
+  --btn-py:12px;
+  --btn-px:calc(var(--btn-py) * 2);
+}
+
+/* Desktop tightens the base type (and can loosen the gutter for 12-col density) */
+@media (min-width:1024px){
+  :root{ --fs-base:13px; --gap:24px; }
+}
+
+/* ── LIGHT THEME — still monochrome + one accent (flip data-theme="light") ── */
+:root[data-theme="light"]{
+  --bg:#f5f5f4; --surface-1:#ffffff; --surface-2:#fafafa; --surface-3:#f0f0ef;
+  --line:rgba(17,17,19,.08);
+  --ink:#15151a; --ink-2:#52525b; --ink-3:#9a9aa3;
+  --shadow:   0 14px 34px -18px rgba(17,17,19,.16);   /* shadow tinted toward bg, not pure black */
+  --shadow-lg:0 30px 60px -28px rgba(17,17,19,.20);
+  --shadow-pop:0 24px 50px -18px rgba(17,17,19,.28);
+  --raise:    inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(17,17,19,.06);
+  --accent-ink:#ffffff;
+  /* semantic, darker inks for contrast on light tints */
+  --info:#1f6fe0;    --info-soft:rgba(31,111,224,.10);  --info-line:rgba(31,111,224,.30);
+  --success:#1f9d63; --success-soft:rgba(31,157,99,.10);--success-line:rgba(31,157,99,.30);
+  --warn:#a9701b;    --warn-soft:rgba(169,112,27,.10);  --warn-line:rgba(169,112,27,.30);
+  --danger:#d83a52;  --danger-soft:rgba(216,58,82,.10); --danger-line:rgba(216,58,82,.30);
+}
+
+/* ── BASE ──────────────────────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);                      /* FLAT — no radial spotlight */
+  color:var(--ink);
+  font:500 var(--t-body)/1.55 var(--font);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ── TYPE SCALE + vertical trim (cap-height → baseline, pixel-perfect alignment) ── */
+h1,h2,h3{font-weight:600;line-height:1.12;letter-spacing:-.02em}
+h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
+.lead{font-size:var(--t-lead)} .cap{font-size:var(--t-cap);color:var(--ink-2)}
+/* eyebrow / kicker label — sentence case, NEVER uppercase (no text-transform) */
+.eyebrow{font-size:var(--t-cap);font-weight:600;letter-spacing:.01em;color:var(--ink-2)}
+.trim{ text-box:trim-both cap alphabetic; }
+@supports not (text-box: trim-both cap alphabetic){
+  /* fallback for older engines: text-box-trim longhands, else tuned line-height */
+  .trim{ text-box-trim:trim-both; text-box-edge:cap alphabetic; }
+}
+
+/* ── GRID — 12 desktop / 2–4 mobile ─────────────────────────────────────────── */
+.grid{ display:grid; gap:var(--gap); grid-template-columns:repeat(4,1fr); }   /* mobile: 4 */
+@media (max-width:420px){ .grid{ grid-template-columns:repeat(2,1fr); } }       /* small phones: 2 */
+@media (min-width:1024px){ .grid{ grid-template-columns:repeat(12,1fr); } }     /* desktop: 12 */
+/* span helpers, e.g. <div class="grid"><div class="col-6">…</div></div> */
+.col-2{grid-column:span 2} .col-3{grid-column:span 3} .col-4{grid-column:span 4}
+.col-6{grid-column:span 6} .col-8{grid-column:span 8} .col-12{grid-column:1/-1}
+@media (max-width:1023px){ [class*="col-"]{grid-column:1/-1} }  /* collapse spans on mobile */
+
+/* ── CARD — single padding, never nested ────────────────────────────────────── */
+.card{
+  background:var(--surface-1);
+  border-radius:var(--r-lg);
+  padding:var(--card-pad);                   /* ONE level of padding only */
+  box-shadow:var(--raise), var(--shadow);    /* raise + soft drop, no hard border */
+}
+.card > * + *{ margin-top:var(--s4); }        /* children space via margin, not nested cards */
+/* DON'T: .card .card{…}  nesting padded cards = double padding. Use a bare wrapper instead. */
+/* DON'T: border-left:3px solid var(--accent)  no side-accent stripes on cards, bars, or buttons. */
+
+/* ── ICONS — one family, SVG, sized to the text line height ──────────────────── */
+.with-icon{ display:inline-flex; align-items:center; gap:.5em; }
+.ico{ width:1em; height:1em; flex:none; display:block; }   /* matches the adjacent text size */
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────────────
+   Consistent per tier. Horizontal padding = 2× vertical. Strokes dimmed/removed;
+   contrast from the raised surface. Four states + focus ring, every time.        */
+.btn{
+  --btn-py:12px;
+  display:inline-flex; align-items:center; justify-content:center; gap:.5em;
+  padding:var(--btn-py) var(--btn-px);
+  border-radius:var(--r-md);
+  border:1px solid transparent;              /* no hard border */
+  font:600 var(--t-body)/1 var(--font);
+  text-box:trim-both cap alphabetic;         /* label sits pixel-centred */
+  color:var(--ink);
+  background:var(--surface-1);               /* grey by default */
+  box-shadow:var(--raise), var(--shadow);    /* the Apple-style raise + soft drop */
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .18s ease, transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.btn:hover{ background:var(--surface-2); }                                  /* hover */
+.btn:active{ transform:translateY(1px) scale(.985);                        /* clicked */
+  background:var(--surface-3); box-shadow:var(--raise); }
+.btn:disabled, .btn[aria-disabled="true"]{ opacity:.4; pointer-events:none; }  /* disabled */
+.btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }      /* keyboard */
+
+/* small tier — 10px radius */
+.btn-sm{ --btn-py:9px; border-radius:var(--r-sm); font-size:var(--t-cap); }
+
+/* the ONE accent action per view (use sparingly) */
+.btn-accent{ background:var(--accent); color:var(--accent-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25), var(--shadow); }
+.btn-accent:hover{ background:var(--accent-2); }
+.btn-accent:active{ background:var(--accent); }
+
+/* ghost — quietest tier */
+.btn-ghost{ background:transparent; box-shadow:none; color:var(--ink-2); }
+.btn-ghost:hover{ background:var(--surface-1); color:var(--ink); }
+
+/* circular icon button / FAB (the "+" in the reference) */
+.btn-icon{ width:48px; height:48px; padding:0; border-radius:50%; }
+.btn-icon.btn-sm{ width:38px; height:38px; }
+
+/* copy/confirm microinteraction state (toggle .is-copied via JS — see patterns.md) */
+.btn.is-copied{ color:var(--ok); }
+.btn.is-copied .ico{ color:var(--ok); }
+
+/* ── SEARCH PILL (reference image) — raised grey pill, muted placeholder ─────── */
+.search{
+  display:flex; align-items:center; gap:.6em;
+  width:100%; padding:14px 18px;
+  border-radius:var(--r-pill);
+  background:var(--surface-1);
+  box-shadow:var(--raise);
+  color:var(--ink);
+}
+.search input{ flex:1; border:0; background:transparent; color:var(--ink);
+  font:500 var(--t-body)/1 var(--font); outline:none; }
+.search input::placeholder{ color:var(--ink-3); }
+.search .ico{ color:var(--ink-3); width:1.15em; height:1.15em; }
+
+/* ── TOOLTIP — pointer devices only (mobile uses the long-press menu) ─────────── */
+[data-tip]{ position:relative; }
+@media (hover:hover){
+  [data-tip]:hover::after, [data-tip]:focus-visible::after{
+    content:attr(data-tip);
+    position:absolute; bottom:calc(100% + 8px); left:50%;
+    background:var(--surface-3); color:var(--ink);
+    font:500 var(--t-cap)/1.2 var(--font);
+    padding:6px 10px; border-radius:8px; white-space:nowrap;
+    box-shadow:var(--shadow); pointer-events:none; z-index:50;
+    opacity:0; transform:translateX(-50%) translateY(4px);
+    animation:av-tip .14s ease forwards;
+  }
+}
+@keyframes av-tip{ to{ opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* ── SEMANTIC: announcement bar — colour carries the meaning; full tint + hairline ring, no side stripe ── */
+.banner{ display:flex; align-items:center; gap:.6em; padding:12px 16px; border-radius:var(--r-md);
+  font:500 var(--t-body)/1.4 var(--font); }
+.banner .ico{ width:1.15em; height:1.15em; flex:none; }
+.banner-info{    background:var(--info-soft);    color:var(--info);    box-shadow:inset 0 0 0 1px var(--info-line); }
+.banner-success{ background:var(--success-soft); color:var(--success); box-shadow:inset 0 0 0 1px var(--success-line); }
+.banner-warn{    background:var(--warn-soft);    color:var(--warn);    box-shadow:inset 0 0 0 1px var(--warn-line); }
+.banner-danger{  background:var(--danger-soft);  color:var(--danger);  box-shadow:inset 0 0 0 1px var(--danger-line); }
+
+/* ── SEMANTIC: chip / badge — small status pill. New = green, Beta = blue, Deprecated = amber ── */
+.badge{ display:inline-flex; align-items:center; gap:.4em; padding:3px 9px; border-radius:var(--r-sm);
+  font-size:var(--t-cap); font-weight:600; letter-spacing:.01em; }
+.badge-new,.badge-success{ background:var(--success-soft); color:var(--success); }
+.badge-info{   background:var(--info-soft);   color:var(--info); }
+.badge-warn{   background:var(--warn-soft);   color:var(--warn); }
+.badge-danger{ background:var(--danger-soft); color:var(--danger); }
+
+/* ── INPUT FIELD + feedback states — focus = accent ring; warn/danger/success = semantic ring + hint ── */
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field .control{ display:flex; align-items:center; gap:.5em; padding:12px 14px; border-radius:var(--r-md);
+  background:var(--surface-1); box-shadow:var(--raise); transition:box-shadow .18s ease; }
+.field input,.field textarea{ flex:1; border:0; background:transparent; color:var(--ink);
+  font:500 var(--t-body)/1.4 var(--font); outline:none; }
+.field input::placeholder{ color:var(--ink-3); }
+.field .control:focus-within{ box-shadow:var(--raise), 0 0 0 2px var(--accent); }      /* focus state */
+.field.is-warn    .control{ box-shadow:var(--raise), 0 0 0 2px var(--warn-line); }      /* warning */
+.field.is-danger  .control{ box-shadow:var(--raise), 0 0 0 2px var(--danger-line); }    /* danger */
+.field.is-success .control{ box-shadow:var(--raise), 0 0 0 2px var(--success-line); }   /* success */
+.hint{ display:flex; align-items:center; gap:.4em; font-size:var(--t-cap); color:var(--ink-3); }
+.hint .ico{ width:1em; height:1em; flex:none; }
+.field.is-warn    .hint{ color:var(--warn); }
+.field.is-danger  .hint{ color:var(--danger); }
+.field.is-success .hint{ color:var(--success); }
+
+/* ── TOAST / inline message — neutral surface + coloured icon (reads without flooding colour) ── */
+.toast{ display:inline-flex; align-items:center; gap:.6em; padding:12px 16px; border-radius:var(--r-md);
+  background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-pop); font:500 var(--t-body)/1.3 var(--font); }
+.toast .ico{ width:1.2em; height:1.2em; flex:none; }
+.toast-success .ico{ color:var(--success); } .toast-danger .ico{ color:var(--danger); }
+.toast-warn .ico{ color:var(--warn); }        .toast-info .ico{ color:var(--info); }
+
+/* ── SPINNER + button loading state — async always shows progress ── */
+.spinner{ width:1.1em; height:1.1em; border-radius:50%; border:2px solid var(--line);
+  border-top-color:var(--accent); animation:av-spin .7s linear infinite; }
+.btn.is-loading{ pointer-events:none; color:transparent; position:relative; }
+.btn.is-loading::after{ content:""; position:absolute; width:1.1em; height:1.1em; border-radius:50%;
+  border:2px solid rgba(255,255,255,.25); border-top-color:#fff; animation:av-spin .7s linear infinite; }
+@keyframes av-spin{ to{ transform:rotate(360deg); } }
+
+/* ── POPOVER / MENU / floating element ON a card — needs the DEEPER shadow to separate ── */
+.popover,.menu,.floating{ box-shadow:var(--shadow-pop); }
+
+/* ── REDUCED MOTION ──────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms!important; transition:none!important; } }

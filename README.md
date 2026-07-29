@@ -32,7 +32,12 @@ warning, red is danger. Everything holds up in both themes.
 
 ## Contents
 
-- `SKILL.md` — the rules and how to apply them
+- `SKILL.md` — the non-negotiables checklist, plus a map of where the detail lives
+- `references/colour.md` — colour, semantic hues, shadows, strokes, dark mode
+- `references/layout.md` — spacing scale, grid, cards, and the collision rules
+- `references/typography.md` — faces, sizes, vertical trim, leading and tracking
+- `references/components.md` — buttons, icons, menus, popovers, card hierarchy, navigation, charts
+- `references/states.md` — inputs, validation, loaders, toasts, tooltips, motion
 - `references/anti-vibecode.css` — the full token sheet plus component classes (drop-in)
 - `references/patterns.md` — drop-in implementations for the behaviours referenced in the skill
 - `references/demo.html` — the whole system rendered, in dark and light, desktop and phone
@@ -86,4 +91,5 @@ Nothing here is Claude-specific.
 - Open `references/demo.html` in a browser to see the target look. It links the real token sheet, so
   it can never drift from the rules.
 - `SKILL.md` reads as an ordinary style guide, and works pasted into any other agent's rules file
-  (Cursor rules, `AGENTS.md`, a system prompt).
+  (Cursor rules, `AGENTS.md`, a system prompt). It carries the checklist; the `references/*.md` files
+  carry the detail behind each rule, so paste those too if you want the full guide in one place.

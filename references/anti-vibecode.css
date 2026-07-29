@@ -433,5 +433,78 @@ p + p{margin-top:var(--s3)}                  /* even gap between paragraphs, one
 /* a quiet inset panel is allowed ONCE, and only for a genuinely different surface (code, preview) */
 .inset{ padding:var(--s3); border-radius:var(--r-md); background:var(--bg); }
 
+/* ── NAVIGATION — one component, two shapes. Desktop is a horizontal bar at the top,
+      mobile is a tab bar in the thumb zone at the bottom. Same items, same states,
+      same fill rule, so switching breakpoint never changes what a control means.
+
+      Markup, per item, two icons in one button:
+        <a class="nav-item" aria-current="page">
+          <svg class="ico ico-line">…outline…</svg>
+          <svg class="ico ico-fill">…solid…</svg>
+          <span>Home</span>
+        </a>
+
+      THE FILL RULE: an icon is outline at rest and SOLID whenever the item is pressed
+      or is the current page. Fill is the state signal, so the nav needs no second
+      colour to say where you are. ── */
+.nav-item .ico-fill,.tab .ico-fill{ display:none; }
+.nav-item:active .ico-line,.tab:active .ico-line,
+.nav-item[aria-current="page"] .ico-line,.tab[aria-current="page"] .ico-line{ display:none; }
+.nav-item:active .ico-fill,.tab:active .ico-fill,
+.nav-item[aria-current="page"] .ico-fill,.tab[aria-current="page"] .ico-fill{ display:block; }
+.ico-fill{ fill:currentColor; stroke:none; }
+
+/* desktop bar: brand on the left, items beside it, actions pushed right */
+.nav{ display:flex; align-items:center; gap:var(--s4); min-height:56px;
+  padding:var(--s2) var(--s3); border-radius:var(--r-lg);
+  background:var(--surface-1); box-shadow:var(--shadow); }
+.nav-brand{ display:inline-flex; align-items:center; gap:.5em; padding:0 var(--s2);
+  font-weight:600; line-height:var(--lh-flat); white-space:nowrap; }
+.nav-items{ display:flex; align-items:center; gap:var(--s1); min-width:0; }
+.nav-actions{ display:flex; align-items:center; gap:var(--s2); margin-left:auto; }
+
+.nav-item{ display:inline-flex; align-items:center; gap:.5em; position:relative;
+  padding:10px var(--s3); border:0; border-radius:var(--r-sm); background:transparent;
+  color:var(--ink-2); font:500 var(--t-body)/var(--lh-flat) var(--font);
+  white-space:nowrap; text-decoration:none; cursor:pointer;
+  transition:background .16s ease, color .16s ease; }
+.nav-item:hover{ background:var(--surface-2); color:var(--ink); }
+.nav-item:active{ background:var(--surface-3); color:var(--ink); }
+.nav-item:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.nav-item[aria-current="page"]{ background:var(--surface-3); color:var(--ink); }
+.nav-item[aria-disabled="true"]{ opacity:.4; pointer-events:none; }
+.nav-item .ico,.tab .ico{ width:1em; height:1em; flex:none; }
+
+/* mobile tab bar: fixed to the bottom, equal columns, clear of the home indicator.
+   The scroll container it sits over needs bottom padding to match, or it covers content. */
+.tabbar{ display:grid; grid-auto-flow:column; grid-auto-columns:1fr; align-items:stretch;
+  gap:var(--s1); padding:var(--s2) var(--s2) calc(var(--s2) + env(safe-area-inset-bottom));
+  background:var(--surface-1); box-shadow:var(--shadow-pop); }
+.tabbar.is-fixed{ position:fixed; left:0; right:0; bottom:0; z-index:var(--z-sticky); }
+.tabbar.is-floating{ border-radius:var(--r-lg); }   /* a detached pill, inset from the edges */
+
+/* In a tab bar the ICON is the target and the word is only a caption for it, so the
+   icon runs large and the label small. Sizing them off --fs-base, not off each other,
+   keeps that ratio fixed no matter which one changes. */
+.tab{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:var(--s2); min-height:56px; min-width:0; padding:var(--s2) var(--s1);
+  border:0; border-radius:var(--r-sm); background:transparent; color:var(--ink-3);
+  font:500 var(--t-body)/var(--lh-flat) var(--font);
+  text-decoration:none; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:background .16s ease, color .16s ease; }
+.tab .ico{ width:1.6em; height:1.6em; }            /* the icon carries the meaning */
+.tab span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:calc(var(--fs-base) * .68); line-height:var(--lh-flat);
+  letter-spacing:var(--tr-cap); }                  /* the word only names the icon */
+.tab:active{ background:var(--surface-2); color:var(--ink); }
+.tab:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
+.tab[aria-current="page"]{ color:var(--ink); }
+.tab[aria-disabled="true"]{ opacity:.4; pointer-events:none; }
+
+/* a count or status dot notched onto a nav icon — the ONE deliberate overlap here */
+.nav-dot{ position:absolute; top:6px; left:calc(var(--s3) + .55em); width:6px; height:6px;
+  border-radius:50%; background:var(--danger); box-shadow:0 0 0 2px var(--surface-1); }
+.tab .nav-dot{ top:7px; left:calc(50% + .55em); }
+
 /* ── REDUCED MOTION ──────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms!important; transition:none!important; } }

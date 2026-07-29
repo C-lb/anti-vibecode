@@ -13,6 +13,8 @@
 .wrap{ max-width:1180px; margin:0 auto; padding:var(--s5) var(--s4) var(--s8); }
 @media (min-width:1024px){ .wrap{ padding:var(--s7) var(--s6) var(--s8); } }
 
+/* sticky chrome reserves its own space, so a jump link never lands under the header */
+:root{ --sticky-h:64px; }
 .topbar{ position:sticky; top:0; z-index:var(--z-sticky); background:var(--bg);
   padding:var(--s4) 0; margin-bottom:var(--s5);
   display:flex; align-items:center; justify-content:space-between; gap:var(--s4); }
@@ -21,6 +23,7 @@
 @media (max-width:640px){                    /* stack the header instead of overflowing it */
   .topbar{ flex-wrap:wrap; gap:var(--s3); }
   .topbar .title{ flex:1 1 100%; }
+  .topbar .acts{ flex:1 1 100%; flex-wrap:wrap; }  /* three actions wrap instead of overflowing */
   .topbar h3{ font-size:var(--t-lead); }
 }
 
@@ -98,6 +101,19 @@ section{ margin-top:var(--s7); }
 #menu{ position:fixed; z-index:var(--z-overlay); display:none; }   /* styling comes from .menu in the sheet */
 #menu.on{ display:block; }
 
+/* nav bench: two device shells, one shown at a time */
+.seg{ display:inline-flex; align-items:center; gap:var(--s1); padding:4px;
+  border-radius:var(--r-md); background:var(--surface-1); }
+.seg .btn[aria-pressed="true"]{ background:var(--surface-3); color:var(--ink); }
+.shell{ padding:var(--s4); border-radius:var(--r-lg); background:var(--bg);
+  box-shadow:inset 0 0 0 1px var(--line); overflow-x:auto; }  /* desktop bar scrolls on a narrow screen */
+.shell[hidden]{ display:none; }
+.shell-phone{ position:relative; width:100%; max-width:390px; margin:0 auto;
+  min-height:480px; padding-bottom:110px; border-radius:28px; overflow:hidden; }
+.shell-phone .tabbar{ position:absolute; left:var(--s3); right:var(--s3); bottom:var(--s3); }
+.fake{ display:flex; flex-direction:column; gap:var(--s3); margin-top:var(--s4); }
+.fake .skeleton:nth-child(2){ width:70% } .fake .skeleton:nth-child(4){ width:52% }
+
 /* toast host */
 #toasts{ position:fixed; z-index:var(--z-toast); left:50%; bottom:var(--s5); transform:translateX(-50%);
   display:flex; flex-direction:column; gap:var(--s2); align-items:center; }
@@ -116,6 +132,10 @@ section{ margin-top:var(--s7); }
       <h3 class="trim">Anti-vibecode reference</h3>
     </div>
     <div class="acts">
+      <button class="btn btn-sm btn-ghost with-icon" id="go-nav" data-tip="Jump to the navbar bench">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg>
+        <span>Navbar</span>
+      </button>
       <button class="btn btn-sm btn-ghost with-icon" id="theme" data-tip="Switch light and dark">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         <span id="theme-label">Light</span>
@@ -823,6 +843,113 @@ section{ margin-top:var(--s7); }
     </div>
   </section>
 
+  <!-- ── 12 · NAVIGATION ────────────────────────────────────────────────── -->
+  <section id="nav-bench">
+    <div class="sec-head">
+      <span class="eyebrow trim">Section 12</span>
+      <h3 class="trim">Navigation, web and phone</h3>
+      <p class="rule-note">One set of items, two shapes. Desktop is a bar at the top, phone is a tab bar
+        in the thumb zone. Every icon is outline at rest and solid the moment the item is pressed or is
+        the current page, so the nav says where you are without a second colour.</p>
+    </div>
+
+    <div class="stack">
+      <div class="row" style="justify-content:space-between">
+        <div class="seg" role="group" aria-label="Choose a viewport">
+          <button class="btn btn-sm btn-ghost" id="view-web" aria-pressed="true" data-tip="Desktop bar">Web</button>
+          <button class="btn btn-sm btn-ghost" id="view-phone" aria-pressed="false" data-tip="Phone tab bar">Phone</button>
+        </div>
+        <span class="label">Press and hold an item to watch its icon fill.</span>
+      </div>
+
+      <!-- desktop bar -->
+      <div class="shell" id="shell-web">
+        <nav class="nav" aria-label="Primary">
+          <span class="nav-brand">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 15V9l4 4 4-4v6"/></svg>
+            Meridian
+          </span>
+          <div class="nav-items">
+            <a class="nav-item" href="#nav-bench" aria-current="page">
+              <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.6 12 3.8l8.5 6.8V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+              <svg class="ico ico-fill" viewBox="0 0 24 24"><path d="M3.5 10.6 12 3.8l8.5 6.8V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+              <span>Home</span>
+            </a>
+            <a class="nav-item" href="#nav-bench">
+              <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.7-3.7"/></svg>
+              <svg class="ico ico-fill" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M11 2a9 9 0 1 0 5.3 16.3l3 3a1.5 1.5 0 0 0 2.1-2.1l-3-3A9 9 0 0 0 11 2zm0 3a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></svg>
+              <span>Search</span>
+            </a>
+            <a class="nav-item" href="#nav-bench">
+              <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4L12 15.8l-6.5 4.4V4.8a1 1 0 0 1 1-1z"/></svg>
+              <svg class="ico ico-fill" viewBox="0 0 24 24"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4L12 15.8l-6.5 4.4V4.8a1 1 0 0 1 1-1z"/></svg>
+              <span>Saved</span>
+              <span class="nav-dot" aria-hidden="true"></span>
+            </a>
+            <a class="nav-item" href="#nav-bench">
+              <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.9"/><path d="M4.6 20.5a7.4 7.4 0 0 1 14.8 0"/></svg>
+              <svg class="ico ico-fill" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.1 0-7.5 2.7-7.5 6 0 .6.4 1 1 1h13c.6 0 1-.4 1-1 0-3.3-3.4-6-7.5-6z"/></svg>
+              <span>Profile</span>
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg>
+              <span>Reports</span>
+            </span>
+          </div>
+          <div class="nav-actions">
+            <button class="btn btn-sm btn-ghost btn-icon" data-tip="Notifications" aria-label="Notifications">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0v4l2 3H4l2-3z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+            </button>
+            <button class="btn btn-sm btn-accent" id="nav-cta">New post</button>
+          </div>
+        </nav>
+        <p class="rule-note" style="margin-top:var(--s4)">Items are ghost rows until hovered. The current
+          page gets the pressed surface and the solid icon, never an accent stripe. The one accent fill in
+          the bar is the single primary action on the right.</p>
+      </div>
+
+      <!-- phone -->
+      <div class="shell shell-phone" id="shell-phone" hidden>
+        <div class="row" style="justify-content:space-between">
+          <span class="trim" style="font-size:var(--t-h3);font-weight:600">Home</span>
+          <span class="badge badge-new">Live</span>
+        </div>
+        <div class="fake">
+          <div class="skeleton"></div><div class="skeleton"></div>
+          <div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+
+        <nav class="tabbar is-floating" aria-label="Primary">
+          <a class="tab" href="#nav-bench" aria-current="page">
+            <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.6 12 3.8l8.5 6.8V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            <svg class="ico ico-fill" viewBox="0 0 24 24"><path d="M3.5 10.6 12 3.8l8.5 6.8V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>
+            <span>Home</span>
+          </a>
+          <a class="tab" href="#nav-bench">
+            <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.7-3.7"/></svg>
+            <svg class="ico ico-fill" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M11 2a9 9 0 1 0 5.3 16.3l3 3a1.5 1.5 0 0 0 2.1-2.1l-3-3A9 9 0 0 0 11 2zm0 3a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></svg>
+            <span>Search</span>
+          </a>
+          <a class="tab" href="#nav-bench">
+            <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4L12 15.8l-6.5 4.4V4.8a1 1 0 0 1 1-1z"/></svg>
+            <svg class="ico ico-fill" viewBox="0 0 24 24"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4L12 15.8l-6.5 4.4V4.8a1 1 0 0 1 1-1z"/></svg>
+            <span>Saved</span>
+            <span class="nav-dot" aria-hidden="true"></span>
+          </a>
+          <a class="tab" href="#nav-bench">
+            <svg class="ico ico-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.9"/><path d="M4.6 20.5a7.4 7.4 0 0 1 14.8 0"/></svg>
+            <svg class="ico ico-fill" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.1 0-7.5 2.7-7.5 6 0 .6.4 1 1 1h13c.6 0 1-.4 1-1 0-3.3-3.4-6-7.5-6z"/></svg>
+            <span>Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <p class="rule-note measure">The tab bar reserves its own space: the screen carries bottom padding
+        to match, and the bar adds <code>env(safe-area-inset-bottom)</code> so the labels clear the home
+        indicator. Labels truncate rather than wrap, so a longer word never pushes a column open.</p>
+    </div>
+  </section>
+
 </div>
 
 <!-- long-press furniture -->
@@ -910,6 +1037,37 @@ ddM.querySelectorAll('.menu-item').forEach(item => item.addEventListener('click'
 }));
 addEventListener('click', e => { if (!ddM.hidden && !ddM.contains(e.target)) ddSet(false); });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !ddM.hidden){ ddSet(false); ddT.focus(); } });
+
+/* jump to the navbar bench from the header */
+$('#go-nav').addEventListener('click', () =>
+  $('#nav-bench').scrollIntoView({behavior:'smooth', block:'start'}));
+
+/* navbar bench: switch viewport, and keep one current item per bar */
+const views = { web:[$('#view-web'), $('#shell-web')], phone:[$('#view-phone'), $('#shell-phone')] };
+function setView(name){
+  for (const [key, [btn, shell]] of Object.entries(views)){
+    const on = key === name;
+    btn.setAttribute('aria-pressed', String(on));
+    shell.hidden = !on;
+  }
+}
+$('#view-web').addEventListener('click', () => setView('web'));
+$('#view-phone').addEventListener('click', () => setView('phone'));
+
+document.querySelectorAll('.nav-items, .tabbar').forEach(bar => {
+  bar.querySelectorAll('.nav-item, .tab').forEach(item => item.addEventListener('click', e => {
+    e.preventDefault();
+    if (item.getAttribute('aria-disabled') === 'true') return;
+    bar.querySelectorAll('[aria-current]').forEach(a => a.removeAttribute('aria-current'));
+    item.setAttribute('aria-current', 'page');       /* solid icon follows the state, no JS icon swap */
+    toast('info', `${item.querySelector('span').textContent} is a demo route`);
+  }));
+});
+$('#nav-cta').addEventListener('click', e => {
+  const b = e.currentTarget;
+  b.classList.add('is-loading');
+  setTimeout(() => { b.classList.remove('is-loading'); toast('success', 'Draft created'); }, 900);
+});
 
 /* long press to context menu, with desktop right-click parity */
 const card = $('#press-card'), scrim = $('#scrim'), menu = $('#menu');

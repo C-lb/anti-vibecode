@@ -384,6 +384,31 @@ no spinner-less waits, no form that fails silently. Components live in `referenc
 - **Elevation is a ladder, not a pile:** canvas, card, overlay. Three steps is the whole system. If
   something needs a fourth, the layout is wrong.
 
+## 11 · Navigation
+
+One set of items, two shapes. Desktop is a horizontal bar at the top (`.nav`), phone is a tab bar in the
+thumb zone at the bottom (`.tabbar`). Same items, same order, same states in both, so changing breakpoint
+never changes what a control means.
+
+- **The icon fills when the item is pressed or current.** Every nav item carries two icons in the same
+  markup, `.ico-line` (outline, at rest) and `.ico-fill` (solid), and the CSS swaps them on `:active` and
+  on `[aria-current="page"]`. Fill is the state signal, which is why the nav needs no second colour and no
+  underline to say where you are.
+- **Current state is `aria-current="page"`, not a class.** The styling hangs off the attribute, so the
+  accessible name and the visual state can never disagree.
+- **Desktop items are ghost rows.** Transparent at rest with `--ink-2` text, `--surface-2` on hover,
+  `--surface-3` when pressed or current. No accent stripe, no bottom underline bar.
+- **On a tab bar the icon is the target and the word is a caption for it.** The icon runs large (about
+  1.6em) and the label small (about 0.68 of the base), one ink step quieter, because the icon is what gets
+  recognised and tapped. Size both off `--fs-base` rather than off each other so the ratio holds.
+- **One accent per bar, at most.** It belongs to the single primary action sitting in `.nav-actions`,
+  never to a nav item.
+- **The bar reserves its own space.** A bottom tab bar adds `env(safe-area-inset-bottom)` and the scroll
+  container underneath carries matching bottom padding, or the bar covers the last row of content.
+- **Labels truncate, never wrap.** A longer word must not open a column or push a tab out of the grid.
+- **A count or status dot** (`.nav-dot`) is the one deliberate overlap here, and it is semantic: red for
+  something needing attention, not decoration.
+
 ---
 
 ## How to apply this skill

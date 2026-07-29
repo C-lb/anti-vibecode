@@ -62,6 +62,31 @@
   --t-h2:   calc(var(--fs-base) * 1.95);
   --t-h1:   calc(var(--fs-base) * 2.60);
 
+  /* ── LINE RHYTHM — leading tightens as size grows. One value per role, never mixed
+        inside a column. Body leading is the metronome everything else sits against. ── */
+  --lh-display:1.05;                        /* h1 */
+  --lh-h2:     1.12;
+  --lh-h3:     1.22;
+  --lh-lead:   1.45;
+  --lh-body:   1.55;                        /* the default rhythm */
+  --lh-tight:  1.30;                        /* dense UI text: table cells, list rows, hints */
+  --lh-flat:   1;                           /* single-line labels: buttons, chips, tabs */
+
+  /* ── TRACKING — optical letter-spacing. Big type tightens, small type opens up. ── */
+  --tr-display:-.032em;                     /* h1 */
+  --tr-h2:     -.026em;
+  --tr-h3:     -.02em;
+  --tr-lead:   -.01em;
+  --tr-body:    0;                          /* body is neutral, never tracked */
+  --tr-cap:     .006em;
+  --tr-eyebrow: .012em;
+
+  --measure:68ch;                           /* max line length for running text */
+
+  /* ── Z LADDER — the only stacking values in the system. Never invent a 9999. ── */
+  --z-base:0; --z-sticky:40; --z-scrim:60; --z-overlay:70; --z-toast:80;
+  --sticky-h:0px;                           /* set to the real sticky header height per project */
+
   /* ── BUTTON — horizontal padding is ALWAYS 2× vertical ── */
   --btn-py:12px;
   --btn-px:calc(var(--btn-py) * 2);
@@ -91,22 +116,44 @@
 
 /* ── BASE ──────────────────────────────────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%; scroll-padding-top:calc(var(--sticky-h) + var(--s4))}
+
+/* ── COLLISION DEFAULTS — nothing overlaps or clips unless it is meant to.
+      These four lines prevent most accidental overlap before it happens. ── */
+img,svg,video,canvas{ max-width:100%; height:auto; }   /* media never breaks its box */
+.grid > *, .card > *{ min-width:0; }                   /* long children shrink instead of shoving */
+.truncate{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wrap-any{ overflow-wrap:anywhere; }                   /* URLs and tokens can't open a column */
+/* DON'T: a fixed height on anything holding text. Use min-height and let it grow. */
 body{
   background:var(--bg);                      /* FLAT — no radial spotlight */
   color:var(--ink);
-  font:500 var(--t-body)/1.55 var(--font);
+  font:500 var(--t-body)/var(--lh-body) var(--font);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
 
 /* ── TYPE SCALE + vertical trim (cap-height → baseline, pixel-perfect alignment) ── */
-h1,h2,h3{font-weight:600;line-height:1.12;letter-spacing:-.02em}
-h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
-.lead{font-size:var(--t-lead)} .cap{font-size:var(--t-cap);color:var(--ink-2)}
+/* Each role carries its own leading AND tracking. Bigger type = tighter both. */
+h1,h2,h3{font-weight:600}
+h1{font-size:var(--t-h1); line-height:var(--lh-display); letter-spacing:var(--tr-display)}
+h2{font-size:var(--t-h2); line-height:var(--lh-h2);      letter-spacing:var(--tr-h2)}
+h3{font-size:var(--t-h3); line-height:var(--lh-h3);      letter-spacing:var(--tr-h3)}
+p{line-height:var(--lh-body); letter-spacing:var(--tr-body)}
+p + p{margin-top:var(--s3)}                  /* even gap between paragraphs, one value */
+.lead{font-size:var(--t-lead); line-height:var(--lh-lead); letter-spacing:var(--tr-lead)}
+.cap{font-size:var(--t-cap); line-height:var(--lh-tight); letter-spacing:var(--tr-cap); color:var(--ink-2)}
+.measure{max-width:var(--measure)}           /* running text stops at ~68 characters */
 /* eyebrow / kicker label — sentence case, NEVER uppercase (no text-transform) */
-.eyebrow{font-size:var(--t-cap);font-weight:600;letter-spacing:.01em;color:var(--ink-2)}
+/* block, so an eyebrow can never share a line with the control it labels */
+.eyebrow{display:block;font-size:var(--t-cap);font-weight:600;line-height:var(--lh-tight);
+  letter-spacing:var(--tr-eyebrow);color:var(--ink-2)}
+/* Vertical trim removes the font's built-in leading. That is what makes labels sit pixel-centred,
+   but it also means a trimmed pair with a tiny gap really will collide. Always pair .trim with an
+   explicit stack gap of --s2 or more. Use .text-stack when in doubt. */
 .trim{ text-box:trim-both cap alphabetic; }
+.text-stack{ display:flex; flex-direction:column; gap:var(--s2); }   /* eyebrow over title, label over field */
+.text-stack.is-jump{ gap:var(--s3); }                                /* when the size jump is > ~1.5x */
 @supports not (text-box: trim-both cap alphabetic){
   /* fallback for older engines: text-box-trim longhands, else tuned line-height */
   .trim{ text-box-trim:trim-both; text-box-edge:cap alphabetic; }
@@ -137,26 +184,28 @@ h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
 .ico{ width:1em; height:1em; flex:none; display:block; }   /* matches the adjacent text size */
 
 /* ── BUTTONS ─────────────────────────────────────────────────────────────────
-   Consistent per tier. Horizontal padding = 2× vertical. Strokes dimmed/removed;
-   contrast from the raised surface. Four states + focus ring, every time.        */
+   Consistent per tier. Horizontal padding = 2× vertical. Strokes dimmed/removed.
+   FLAT, never shiny: no inset specular edge, no gradient sheen. Labels never wrap.
+   Four states + focus ring, every time.                                          */
 .btn{
   --btn-py:12px;
-  display:inline-flex; align-items:center; justify-content:center; gap:.5em;
+  display:inline-flex; align-items:center; justify-content:center; gap:.6em;
   padding:var(--btn-py) var(--btn-px);
   border-radius:var(--r-md);
   border:1px solid transparent;              /* no hard border */
-  font:600 var(--t-body)/1 var(--font);
+  font:600 var(--t-body)/var(--lh-flat) var(--font);
   text-box:trim-both cap alphabetic;         /* label sits pixel-centred */
+  white-space:nowrap;                        /* one line always, never wraps */
   color:var(--ink);
   background:var(--surface-1);               /* grey by default */
-  box-shadow:var(--raise), var(--shadow);    /* the Apple-style raise + soft drop */
+  box-shadow:var(--shadow);                  /* soft drop only, NO --raise shine */
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   transition:background .18s ease, transform .12s ease, box-shadow .2s ease, opacity .2s ease;
 }
 .btn:hover{ background:var(--surface-2); }                                  /* hover */
 .btn:active{ transform:translateY(1px) scale(.985);                        /* clicked */
-  background:var(--surface-3); box-shadow:var(--raise); }
+  background:var(--surface-3); box-shadow:none; }
 .btn:disabled, .btn[aria-disabled="true"]{ opacity:.4; pointer-events:none; }  /* disabled */
 .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }      /* keyboard */
 
@@ -165,7 +214,7 @@ h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
 
 /* the ONE accent action per view (use sparingly) */
 .btn-accent{ background:var(--accent); color:var(--accent-ink);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.25), var(--shadow); }
+  box-shadow:var(--shadow); }                /* flat accent fill, no inset highlight */
 .btn-accent:hover{ background:var(--accent-2); }
 .btn-accent:active{ background:var(--accent); }
 
@@ -204,7 +253,7 @@ h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
     background:var(--surface-3); color:var(--ink);
     font:500 var(--t-cap)/1.2 var(--font);
     padding:6px 10px; border-radius:8px; white-space:nowrap;
-    box-shadow:var(--shadow); pointer-events:none; z-index:50;
+    box-shadow:var(--shadow); pointer-events:none; z-index:var(--z-overlay);
     opacity:0; transform:translateX(-50%) translateY(4px);
     animation:av-tip .14s ease forwards;
   }
@@ -252,16 +301,137 @@ h1{font-size:var(--t-h1)} h2{font-size:var(--t-h2)} h3{font-size:var(--t-h3)}
 .toast-success .ico{ color:var(--success); } .toast-danger .ico{ color:var(--danger); }
 .toast-warn .ico{ color:var(--warn); }        .toast-info .ico{ color:var(--info); }
 
-/* ── SPINNER + button loading state — async always shows progress ── */
-.spinner{ width:1.1em; height:1.1em; border-radius:50%; border:2px solid var(--line);
+/* ── LOADERS — async always shows progress. Pick by what the user is waiting for:
+      .spinner  a button or small inline action
+      .wheel    a whole view or route settling (the iOS activity look)
+      .dots     something is composing a reply, or a queued job is running
+      .progress indeterminate progress across the top of a view or card
+      .pulse    a live/connected state, not a wait
+      .skeleton content whose SHAPE is already known and is arriving
+   All sized in em, so they inherit the text size, and all inherit currentColor. ── */
+
+/* Every loader is 1.15em square and vertically centred, so a row of them reads as one
+   family and each one stays proportional to the text it sits beside. */
+.spinner,.wheel,.wheel-spokes,.dots,.pulse{ display:inline-block; vertical-align:middle; flex:none; }
+/* loader plus its label — the pairing needs real air, not a 2px nudge */
+.status{ display:inline-flex; align-items:center; gap:.6em; color:var(--ink-2); }
+
+/* ring spinner */
+.spinner{ width:1.15em; height:1.15em; border-radius:50%; border:2px solid var(--line);
   border-top-color:var(--accent); animation:av-spin .7s linear infinite; }
+
+/* wheel, single element — ticks in 8 steps like a native activity indicator */
+.wheel{ width:1.15em; height:1.15em; border-radius:50%; color:var(--ink-2);
+  background:conic-gradient(from 0deg, transparent 0 12%, currentColor);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation:av-spin .9s steps(8) infinite; }
+
+/* wheel, true spokes — <span class="wheel-spokes"><i></i> ×8 </span>
+   Sized to match .spinner and .wheel so a row of loaders reads as one family. */
+.wheel-spokes{ position:relative; display:inline-block; width:1.15em; height:1.15em;
+  vertical-align:middle; color:var(--ink-2); }
+.wheel-spokes i{ position:absolute; left:50%; top:0; width:.14em; height:.36em; margin-left:-.07em;
+  border-radius:999px; background:currentColor; transform-origin:50% 160%;
+  animation:av-fade .8s linear infinite; }
+.wheel-spokes i:nth-child(1){ transform:rotate(0deg);   animation-delay:-.8s }
+.wheel-spokes i:nth-child(2){ transform:rotate(45deg);  animation-delay:-.7s }
+.wheel-spokes i:nth-child(3){ transform:rotate(90deg);  animation-delay:-.6s }
+.wheel-spokes i:nth-child(4){ transform:rotate(135deg); animation-delay:-.5s }
+.wheel-spokes i:nth-child(5){ transform:rotate(180deg); animation-delay:-.4s }
+.wheel-spokes i:nth-child(6){ transform:rotate(225deg); animation-delay:-.3s }
+.wheel-spokes i:nth-child(7){ transform:rotate(270deg); animation-delay:-.2s }
+.wheel-spokes i:nth-child(8){ transform:rotate(315deg); animation-delay:-.1s }
+
+/* three dots jumping in sequence — <span class="dots"><i></i><i></i><i></i></span> */
+.dots{ display:inline-flex; align-items:center; justify-content:center; gap:.34em;
+  width:1.6em; height:1.15em; vertical-align:middle; color:var(--ink-2); }
+.dots i{ width:.32em; height:.32em; border-radius:50%; background:currentColor;
+  animation:av-jump 1.05s ease-in-out infinite; }
+.dots i:nth-child(2){ animation-delay:.14s }
+.dots i:nth-child(3){ animation-delay:.28s }
+
+/* indeterminate bar — sits at the top edge of a view or card.
+   Named .progress, not .bar, because .bar collides with chart bar classes. */
+.progress{ position:relative; height:3px; border-radius:999px; background:var(--surface-3); overflow:hidden; }
+.progress::after{ content:""; position:absolute; top:0; bottom:0; left:0; width:38%; border-radius:inherit;
+  background:var(--accent); animation:av-slide 1.15s ease-in-out infinite; }
+
+/* live pulse — a state, not a wait */
+.pulse{ position:relative; display:inline-block; width:.55em; height:.55em; border-radius:50%;
+  background:var(--success); }
+.pulse::after{ content:""; position:absolute; inset:-.25em; border-radius:50%;
+  border:1px solid var(--success); animation:av-pulse 1.7s ease-out infinite; }
+
+/* skeleton — for content whose shape is already known */
+.skeleton{ height:.75em; border-radius:6px;
+  background:linear-gradient(90deg,var(--surface-2),var(--surface-3),var(--surface-2));
+  background-size:200% 100%; animation:av-sheen 1.4s ease infinite; }
+
+/* button loading state: spinner in place of the label, label width held */
 .btn.is-loading{ pointer-events:none; color:transparent; position:relative; }
 .btn.is-loading::after{ content:""; position:absolute; width:1.1em; height:1.1em; border-radius:50%;
   border:2px solid rgba(255,255,255,.25); border-top-color:#fff; animation:av-spin .7s linear infinite; }
-@keyframes av-spin{ to{ transform:rotate(360deg); } }
 
-/* ── POPOVER / MENU / floating element ON a card — needs the DEEPER shadow to separate ── */
+@keyframes av-spin{ to{ transform:rotate(360deg); } }
+@keyframes av-fade{ to{ opacity:.15; } }
+@keyframes av-jump{ 0%,72%,100%{ transform:translateY(.16em); opacity:.45 }
+                    36%{ transform:translateY(-.16em); opacity:1 } }
+@keyframes av-slide{ 0%{ transform:translateX(-105%) } 100%{ transform:translateX(300%) } }
+@keyframes av-pulse{ 0%{ transform:scale(.7); opacity:.75 } 100%{ transform:scale(1.6); opacity:0 } }
+@keyframes av-sheen{ to{ background-position:-200% 0; } }
+
+/* Reduced motion still has to SHOW progress, so movement becomes a slow fade. */
+@media (prefers-reduced-motion:reduce){
+  .spinner,.wheel,.btn.is-loading::after{ animation:av-breathe 1.8s ease-in-out infinite; }
+  .wheel-spokes i,.dots i,.pulse::after,.progress::after,.skeleton{
+    animation:av-breathe 1.8s ease-in-out infinite; transform:none; }
+  .dots i:nth-child(2){ animation-delay:.3s } .dots i:nth-child(3){ animation-delay:.6s }
+  .progress::after{ width:100%; }
+}
+@keyframes av-breathe{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
+
+/* ── OVERLAYS — anything floating ABOVE a card sits on --surface-2 and takes the DEEPER
+      shadow, so it separates instead of merging into the card underneath. ── */
 .popover,.menu,.floating{ box-shadow:var(--shadow-pop); }
+
+/* dropdown trigger: an ordinary button plus a chevron that flips when open.
+   A trailing affordance is SMALLER and quieter than the label it follows. */
+.select .ico-chev{ width:.85em; height:.85em; color:var(--ink-3); transition:transform .18s ease; }
+.select[aria-expanded="true"] .ico-chev{ transform:rotate(180deg); }
+
+/* MENU = a list of actions */
+.menu{ min-width:200px; padding:6px; border-radius:var(--r-md);
+  background:var(--surface-2); box-shadow:var(--shadow-pop); }
+.menu-label{ padding:6px 12px 4px; font-size:var(--t-cap); line-height:var(--lh-tight);
+  letter-spacing:var(--tr-cap); color:var(--ink-3); }
+.menu-item{ display:flex; align-items:center; gap:.6em; width:100%;
+  padding:10px 12px; border:0; border-radius:var(--r-sm); background:transparent;
+  color:var(--ink); font:500 var(--t-body)/var(--lh-flat) var(--font);
+  text-align:left; white-space:nowrap; cursor:pointer; }
+.menu-item:hover{ background:var(--surface-3); }
+.menu-item:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
+.menu-item[aria-disabled="true"]{ opacity:.4; pointer-events:none; }
+.menu-item.is-danger{ color:var(--danger); }
+.menu-item .meta{ margin-left:auto; padding-left:var(--s4);
+  font-size:var(--t-cap); color:var(--ink-3); }        /* shortcut or count, right-aligned */
+.menu-item[aria-checked="true"]{ color:var(--ink); }
+.menu-sep{ height:1px; margin:6px 4px; background:var(--line); }
+
+/* POPOVER = content, not a list of actions (a hint, a form, a summary) */
+.popover{ max-width:320px; padding:var(--s4); border-radius:var(--r-md);
+  background:var(--surface-2); color:var(--ink); }
+.popover > * + *{ margin-top:var(--s3); }
+.popover .pop-title{ font-weight:600; line-height:var(--lh-tight); }
+
+/* ── CARD HIERARCHY — one focal card per view. Depth comes from the surface ladder,
+      never from stacking padded boxes inside each other. ── */
+.card-flat{ box-shadow:none; }                  /* many-of-a-kind rows: lists, grids of results */
+.card-lifted{ box-shadow:var(--raise), var(--shadow-lg); }   /* the ONE focal card */
+/* inside a card, separate groups with a divider, NOT a nested padded card */
+.card-sep{ height:1px; margin:var(--s4) calc(var(--card-pad) * -1); background:var(--line); }
+/* a quiet inset panel is allowed ONCE, and only for a genuinely different surface (code, preview) */
+.inset{ padding:var(--s3); border-radius:var(--r-md); background:var(--bg); }
 
 /* ── REDUCED MOTION ──────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms!important; transition:none!important; } }

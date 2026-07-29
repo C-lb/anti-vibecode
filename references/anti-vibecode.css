@@ -90,6 +90,11 @@
   /* ── BUTTON — horizontal padding is ALWAYS 2× vertical ── */
   --btn-py:12px;
   --btn-px:calc(var(--btn-py) * 2);
+
+  /* A button resting ON a card can't be the same fill as the card, or it disappears.
+     Dark: step UP the ladder (more light). Light: step DOWN (a grey against white). */
+  --on-card:       var(--surface-2);
+  --on-card-hover: var(--surface-3);
 }
 
 /* Desktop tightens the base type (and can loosen the gutter for 12-col density) */
@@ -107,6 +112,8 @@
   --shadow-pop:0 24px 50px -18px rgba(17,17,19,.28);
   --raise:    inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(17,17,19,.06);
   --accent-ink:#ffffff;
+  /* on a white card, "up the ladder" would be invisible, so a button steps DOWN to a grey */
+  --on-card:#eeeeec; --on-card-hover:#e4e4e1;
   /* semantic, darker inks for contrast on light tints */
   --info:#1f6fe0;    --info-soft:rgba(31,111,224,.10);  --info-line:rgba(31,111,224,.30);
   --success:#1f9d63; --success-soft:rgba(31,157,99,.10);--success-line:rgba(31,157,99,.30);
@@ -221,6 +228,16 @@ p + p{margin-top:var(--s3)}                  /* even gap between paragraphs, one
 /* ghost — quietest tier */
 .btn-ghost{ background:transparent; box-shadow:none; color:var(--ink-2); }
 .btn-ghost:hover{ background:var(--surface-1); color:var(--ink); }
+
+/* ON A CARD — a button must never share the card's fill, or it vanishes into it.
+   Elevation is the same ladder as overlays: one surface step plus the deeper shadow. */
+.card .btn{ background:var(--on-card); box-shadow:var(--shadow-pop); }
+.card .btn:hover{ background:var(--on-card-hover); }
+.card .btn:active{ background:var(--on-card-hover); box-shadow:none; }
+.card .btn-ghost{ background:transparent; box-shadow:none; }
+.card .btn-ghost:hover{ background:var(--on-card); }
+.card .btn-accent{ background:var(--accent); }
+.card .btn-accent:hover{ background:var(--accent-2); }
 
 /* circular icon button / FAB (the "+" in the reference) */
 .btn-icon{ width:48px; height:48px; padding:0; border-radius:50%; }
